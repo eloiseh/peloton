@@ -74,6 +74,18 @@ class StringFunctions {
   // Length will return the number of characters in the given string
   static uint32_t Length(executor::ExecutorContext &ctx, const char *str,
                          uint32_t length);
+
+  // Convert string to upper case
+  static char *Upper(executor::ExecutorContext &ctx, const char *str,
+                     uint32_t length);
+
+  // Convert string to lower case
+  static char *Lower(executor::ExecutorContext &ctx, const char *str,
+                     uint32_t length);
+
+  // String concatenation
+  static StrWithLen Concat(executor::ExecutorContext &ctx, const char **strs,
+                           const uint32_t *lengths, uint32_t size);
 };
 
 }  // namespace function

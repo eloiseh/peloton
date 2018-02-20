@@ -220,5 +220,70 @@ uint32_t StringFunctions::Length(
   return length;
 }
 
+char *StringFunctions::Upper(executor::ExecutorContext &ctx, const char *str,
+                             uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Perform upper
+  for (uint32_t i = 0; i < length; i++) {
+    new_str[i] = std::toupper(str[i]);
+  }
+
+  // We done
+  return new_str;
+}
+
+char *StringFunctions::Lower(executor::ExecutorContext &ctx, const char *str,
+                             uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Perform lower
+  for (uint32_t i = 0; i < length; i++) {
+    new_str[i] = std::tolower(str[i]);
+  }
+
+  // We done
+  return new_str;
+}
+
+StringFunctions::StrWithLen StringFunctions::Concat(
+    executor::ExecutorContext &ctx, const char **strs, const uint32_t *lengths,
+    uint32_t size) {
+  // Determine the number of bytes we need
+  uint32_t total_len = 0;
+  for (uint32_t i = 0; i < size; i++) {
+    total_len += lengths[i] > 0 ? lengths[i] - 1 : 0;
+  }
+  if (total_len == 0) {
+    return StringFunctions::StrWithLen{nullptr, 0};
+  }
+  total_len += 1;
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(total_len));
+
+  // Perform concat
+  char *ptr = new_str;
+  for (uint32_t i = 0; i < size; i++) {
+    // just ignore null
+    if (lengths[i] > 1) {
+      PL_MEMCPY(ptr, strs[i], lengths[i] - 1);
+      ptr += (lengths[i] - 1);
+    }
+  }
+
+  // We done
+  return StringFunctions::StrWithLen{new_str, total_len};
+}
+
 }  // namespace function
 }  // namespace peloton
